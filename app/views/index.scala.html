@@ -1,7 +1,33 @@
-@(message: String)
+@(entries: Seq[Entry])
+@import java.text.DecimalFormat; val formatter = new DecimalFormat("#,###.00")
 
-@main("Welcome to Play") {
+@main("Budgetron 1.0") {
 
-    @play20.welcome(message)
+<h2>Grand Total: @formatter.format(entries.foldLeft(0.0){(z, i) => z + i.amount})</h2>
+    <button type="button"
+    onclick="document.getElementById('demo').innerHTML = Date()">
+        Click me to display Date and Time.</button>
+
+    <p id="demo"></p>
+    
+    <fieldset>
+        <legend align="center"><h3>All Entries</h3> </legend>
+        <table cellspacing="20" align="center">
+            <tr>
+                <th>id</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Timestamp</th>
+            </tr>
+            @for(entry <- entries) {
+                <tr>
+                    <td>@entry.id</td>
+                    <td>@formatter.format(entry.amount)</td>
+                    <td>@entry.description</td>
+                    <td>@entry.entry_time</td>
+                </tr>
+            }
+        </table>
+    </fieldset>
 
 }
