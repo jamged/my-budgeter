@@ -1,5 +1,7 @@
 package controllers
 
+import javax.inject.Inject
+
 import play.api._
 import play.api.mvc._
 import play.api.Play.current
@@ -7,12 +9,13 @@ import play.api.i18n.Messages.Implicits._
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.libs.json.Json
 
+import dao._
 import models._
 
-class Application extends Controller {
+class Application @Inject() (entryDAO: EntryDAO) extends Controller {
 
   def index = Action.async { implicit request =>
-    Entries.listAll map {entries =>
+    entryDAO.listAll map {entries =>
       Ok(views.html.index(entries))
     }
   }
@@ -29,14 +32,14 @@ class Application extends Controller {
         println("value: " + formData.amount)
         println("description: " + formData.description)
         println("transaction: " + formData.transaction)
-        Entries.add(EntryMaker(formData))
+        entryDAO.add(EntryMaker(formData))
         Redirect(routes.Application.index())
       }
     )
   }
 
   def toJson = Action.async {
-    Entries.listAll map {entries =>
+    entryDAO.listAll map {entries =>
       Ok(Json.toJson(entries))
     }
   }

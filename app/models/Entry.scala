@@ -3,17 +3,12 @@ package models
 import java.sql.Timestamp
 import java.util.Calendar
 
-import play.api.Play
-import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import scala.concurrent.Future
-import slick.driver.JdbcProfile
-import slick.driver.PostgresDriver.api._
 
 
 // Case class for items stored in "entry" table
-case class Entry (id: Long, amount: Double, description: String, entry_time: Timestamp)
+case class Entry (id: Long = 0, amount: Double, description: String, entry_time: Timestamp)
 
 object Entry {
   // JSON formatter for reads/writes
@@ -34,33 +29,5 @@ object EntryMaker {
     val theTime = Calendar.getInstance().getTimeInMillis
     val credit = formData.transaction.toDouble
     new Entry(0, credit*formData.amount, formData.description, new Timestamp(theTime))
-  }
-}
-
-
-// Slick table definition for "entry" table
-class EntryTableDef(tag: Tag) extends Table[Entry](tag, "entry") {
-  def id = column[Long]("id", O.PrimaryKey,O.AutoInc)
-  def amount = column[Double]("amount")
-  def description = column[String]("description")
-  def entry_time = column[Timestamp]("entry_time")
-
-  override def * =
-    (id, amount, description, entry_time) <> (Entry.tupled, Entry.unapply)
-}
-
-
-// Object for "entry" table transactions
-object Entries {
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
-  val entries = TableQuery[EntryTableDef]
-
-  def add(entry: Entry) = {
-    println("Adding new entry:" + entry)
-    dbConfig.db.run(entries += entry)
-  }
-
-  def listAll: Future[Seq[Entry]] = {
-    dbConfig.db.run(entries.sortBy(_.entry_time.desc).result)
   }
 }
