@@ -9,7 +9,7 @@ case class EntryFormData(amount: Double, description: String, transaction: Strin
 object EntryForm {
   val form = Form(
     mapping(
-      "amount" -> of(doubleFormat),
+      "amount" -> of(doubleFormat).verifying("Amount must be positive!", d => d>0),
       "description" -> nonEmptyText,
       "transaction" -> nonEmptyText
     )(EntryFormData.apply)(EntryFormData.unapply)

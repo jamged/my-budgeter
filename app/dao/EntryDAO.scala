@@ -2,7 +2,7 @@ package dao
 
 import java.sql.Timestamp
 import javax.inject.Inject
-import models.Entry
+import models.{EntryFormData, Entry}
 import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import scala.concurrent.Future
@@ -21,8 +21,24 @@ class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     db.run(Entries += entry).map {_ => ()}
   }
 
+  def update(id: Long, data:Entry) = {
+    println("Updating entry id: " + id)
+    val q = for {e <- Entries if e.id === id } yield (e.amount, e.description)
+    db.run(q.update(data.amount, data.description))
+  }
+
+  def delete(id: Long) = {
+    println("Deleting entry id: " + id)
+    val q = for {e <- Entries if e.id === id } yield e
+    db.run(q.delete)
+  }
+
   def listAll: Future[Seq[Entry]] = {
     db.run(Entries.result)
+  }
+
+  def findById(entryId: Long): Future[Option[Entry]] = {
+    db.run(Entries.filter(_.id === entryId).result.headOption)
   }
 
   private class EntryTable(tag: Tag) extends Table[Entry](tag, "entry") {

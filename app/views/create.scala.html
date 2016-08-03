@@ -1,4 +1,4 @@
-@(entryForm: Form[EntryFormData])(implicit messages: Messages)
+@(entryForm: Form[EntryFormData], id: Long = 0)(implicit messages: Messages)
 @import helper._
 
 
@@ -6,7 +6,7 @@
 @main("Budgetron 1.0") {
     <h2> Fill out the form for a new budget entry</h2>
 
-     @form(action = routes.Application.addEntry()) {
+     @form(action = if (id !=0) routes.Application.updateEntry(id) else routes.Application.addEntry()) {
         @inputText(entryForm("amount"), '_showConstraints -> false, '_label -> "Amount:")
         @inputText(entryForm("description"), 'size->50, '_showConstraints -> false, '_label -> "Description:")
         @inputRadioGroup(
@@ -16,5 +16,9 @@
             '_showConstraints->false)
 
         <input type="submit" title="Go!" value="Submit"  />
+    }
+<p></p>
+    @form(action = routes.Application.deleteEntry(id)) {
+        <input type="submit" title="Delet this" value="Delete"  />
     }
 }
