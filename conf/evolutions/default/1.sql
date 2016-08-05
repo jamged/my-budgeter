@@ -1,18 +1,19 @@
 # --- !Ups
-CREATE TABLE "entry" (
+CREATE TABLE "entries" (
   "id" SERIAL NOT NULL PRIMARY KEY,
   "amount" DOUBLE PRECISION NOT NULL,
   "description" TEXT,
-  "entry_time" TIMESTAMP NOT NULL
+  "entry_time" TIMESTAMP NOT NULL,
+  "cat_id" INTEGER
 );
 
---CREATE TABLE tag (
---  id SERIAL NOT NULL PRIMARY KEY,
---  name TEXT NOT NULL,
---  description TEXT,
---  parent_id INTEGER
---);
+CREATE TABLE "categories" (
+  "id" SERIAL NOT NULL PRIMARY KEY,
+  "name" VARCHAR NOT NULL UNIQUE,
+  "description" TEXT,
+);
+
 
 # --- !Downs
-DROP TABLE "entry";
---DROP TABLE tag;
+DROP TABLE "entries";
+DROP TABLE "categories";

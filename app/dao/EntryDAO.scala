@@ -2,7 +2,7 @@ package dao
 
 import java.sql.Timestamp
 import javax.inject.Inject
-import models.{EntryFormData, Entry}
+import models.{EntryFormData, Entry, Category}
 import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import scala.concurrent.Future
@@ -11,7 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 /**
   * Created by user on 8/1/16.
   */
-class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, categoryDAO: CategoryDAO) extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
   private val Entries = TableQuery[EntryTable]
@@ -23,8 +23,8 @@ class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   def update(id: Long, data:Entry) = {
     println("Updating entry id: " + id)
-    val q = for {e <- Entries if e.id === id } yield (e.amount, e.description)
-    db.run(q.update(data.amount, data.description))
+    val q = for {e <- Entries if e.id === id } yield (e.amount, e.description, e.catID)
+    db.run(q.update(data.amount, data.description, data.catID))
   }
 
   def delete(id: Long) = {
@@ -37,17 +37,28 @@ class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     db.run(Entries.result)
   }
 
+  def listWithCat: Future[Seq[(Entry, Category)]] = {
+    val q = for {
+      e <- Entries
+      c <- e.category
+    } yield (e, c)
+    db.run(q.result)
+  }
+
   def findById(entryId: Long): Future[Option[Entry]] = {
     db.run(Entries.filter(_.id === entryId).result.headOption)
   }
 
-  private class EntryTable(tag: Tag) extends Table[Entry](tag, "entry") {
+  private class EntryTable(tag: Tag) extends Table[Entry](tag, "entries") {
     def id = column[Long]("id", O.PrimaryKey,O.AutoInc)
     def amount = column[Double]("amount")
     def description = column[String]("description")
     def entry_time = column[Timestamp]("entry_time")
+    def catID = column[Long]("cat_id")
+
+    def category = foreignKey("cat_fk", catID, categoryDAO.Categories)(_.id)
 
     override def * =
-      (id, amount, description, entry_time) <> (Entry.tupled, Entry.unapply)
+      (id, amount, description, entry_time, catID) <> (Entry.tupled, Entry.unapply)
   }
 }

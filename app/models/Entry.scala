@@ -8,7 +8,7 @@ import play.api.libs.functional.syntax._
 
 
 // Case class for items stored in "entry" table
-case class Entry (id: Long = 0, amount: Double, description: String, entry_time: Timestamp)
+case class Entry (id: Long = 0, amount: Double, description: String, entry_time: Timestamp, catID: Long)
 
 object Entry {
   // JSON formatter for reads/writes
@@ -16,9 +16,10 @@ object Entry {
     (JsPath \ "id").format[Long] and
     (JsPath \ "amount").format[Double] and
     (JsPath \ "description").format[String] and
-    (JsPath \ "entry_time").format[Long]
-    )((id:Long, amt:Double, desc:String, time:Long)=> new Entry(id,amt,desc,new Timestamp(time)),
-      (e:Entry) => (e.id, e.amount, e.description, e.entry_time.getTime))
+    (JsPath \ "entry_time").format[Long] and
+    (JsPath \ "cat_id").format[Long]
+    )((id:Long, amt:Double, desc:String, time:Long, catID:Long)=> new Entry(id,amt,desc,new Timestamp(time), catID),
+      (e:Entry) => (e.id, e.amount, e.description, e.entry_time.getTime, e.catID))
 
   def tupled = (Entry.apply _).tupled
 
@@ -26,8 +27,10 @@ object Entry {
 
 object EntryMaker {
   def apply(formData: EntryFormData) = {
+    val test = Seq("hey" -> "yee", "wut" -> "upp")
+    val sty = "yes" -> "maam"
     val theTime = Calendar.getInstance().getTimeInMillis
     val credit = formData.transaction.toDouble
-    new Entry(0, credit*formData.amount, formData.description, new Timestamp(theTime))
+    new Entry(0, credit*formData.amount, formData.description, new Timestamp(theTime), formData.catID)
   }
 }

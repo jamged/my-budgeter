@@ -1,0 +1,21 @@
+@(entryForm: Form[CategoryFormData], categories: Seq[Category], id: Long = 0)(implicit messages: Messages)
+@import helper._
+
+
+
+@main("Budgetron 1.0") {
+<h2> Fill out the form for a new category entry</h2>
+
+@form(action = /*if (id !=0) routes.Application.updateCategory(id) else */ routes.Application.addCategory()) {
+@inputText(entryForm("name"), 'size->20, '_showConstraints -> false, '_label -> "Category Name:")
+@inputText(entryForm("description"), 'size->50, '_showConstraints -> false, '_label -> "Description:")
+
+@if(id != 0) {
+<input type="submit" formaction=@routes.Application.deleteEntry(id) value="Delete" />
+<br><br>
+}
+
+<input type="submit" value="Submit"  />
+}
+
+}
