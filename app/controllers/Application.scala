@@ -48,7 +48,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
     }
   }
 
-  def edit(entryId: Long) = Action.async {
+  def editEntry(entryId: Long) = Action.async {
     for {
       entries <- entryDAO.listAll
       categories <- categoryDAO.listAll
@@ -107,15 +107,18 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
       }
   }
 
+  def editCategory(catID: Long) = Action {
+    printf("should edit category with ID: %d", catID)
+    Redirect(routes.Application.index())
+  }
+
   def updateCategory(catID: Long) = Action {
     Redirect(routes.Application.index())
   }
 
-
-  def populateCategories = Action {
-    categoryDAO.add(Category(0, "category 1", "this is the first category"))
-    categoryDAO.add(Category(0, "category 2", "this is the second category"))
-    categoryDAO.add(Category(0, "category 3", "this is the third category"))
-    Redirect(routes.Application.index())
+  def showCategories = Action.async {
+    categoryDAO.listAll map { categories =>
+      Ok(views.html.categories(categories))
+    }
   }
 }

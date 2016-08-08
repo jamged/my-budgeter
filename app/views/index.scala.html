@@ -29,7 +29,7 @@
             </tr>
             @for(entry <- entries) {
                 <tr>
-                    <td><a href="@routes.Application.edit(entry._1.id)">Edit</a></td>
+                    <td><a href="@routes.Application.editEntry(entry._1.id)">Edit</a></td>
                     <td>@formatter.format(entry._1.amount)</td>
                     <td>@entry._1.description</td>
                     <td>@entry._2.name</td>

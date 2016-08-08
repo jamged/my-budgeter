@@ -5,23 +5,25 @@
 # Home page
 GET     /                           controllers.Application.index
 
-GET     /entry/new                  controllers.Application.defineNewEntry
+GET     /entries/new                controllers.Application.defineNewEntry
 
-POST    /entry/new                  controllers.Application.addEntry
+POST    /entries/new                controllers.Application.addEntry
 
 GET     /json                       controllers.Application.toJson
 
-GET     /entry/edit/:id             controllers.Application.edit(id:Long)
+GET     /entries/edit/:id           controllers.Application.editEntry(id:Long)
 
-POST    /entry/edit/:id             controllers.Application.updateEntry(id:Long)
+POST    /entries/edit/:id           controllers.Application.updateEntry(id:Long)
 
-POST    /entry/delete/:id           controllers.Application.deleteEntry(id:Long)
+POST    /entries/delete/:id         controllers.Application.deleteEntry(id:Long)
 
-GET     /test                       controllers.Application.populateCategories
+GET     /categories/new             controllers.Application.defineNewCategory
 
-GET     /category/new               controllers.Application.defineNewCategory
+POST    /categories/new             controllers.Application.addCategory
 
-POST    /category/new               controllers.Application.addCategory
+GET     /categories                 controllers.Application.showCategories
+
+GET     /categories/edite/:id       controllers.Application.editCategory(id:Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

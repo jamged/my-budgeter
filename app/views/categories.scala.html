@@ -1,0 +1,29 @@
+@(categories: Seq[Category])
+
+@main("Budgetron 1.0") {
+
+<h2>All Categories</h2>
+
+<form action=@routes.Application.defineNewCategory>
+    <input type="submit" value="Create New Category">
+</form>
+
+<fieldset>
+    <legend align="center"><h3>All Categories</h3> </legend>
+    <table cellspacing="20" align="center">
+        <tr>
+            <th>Edit</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        @for(category <- categories) {
+        <tr>
+            <td><a href="@routes.Application.editCategory(category.id)">Edit</a></td>
+            <td>@category.name</td>
+            <td>@category.description</td>
+        </tr>
+        }
+    </table>
+</fieldset>
+
+}
