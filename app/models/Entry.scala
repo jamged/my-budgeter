@@ -8,7 +8,7 @@ import play.api.libs.functional.syntax._
 
 
 // Case class for items stored in "entry" table
-case class Entry (id: Long = 0, amount: Double, description: String, entry_time: Timestamp, catID: Long)
+case class Entry (id: Long = 0, amount: Double, description: String, entry_time: Timestamp, catID: Long = 0)
 
 object Entry {
   // JSON formatter for reads/writes
@@ -27,10 +27,8 @@ object Entry {
 
 object EntryMaker {
   def apply(formData: EntryFormData) = {
-    val test = Seq("hey" -> "yee", "wut" -> "upp")
-    val sty = "yes" -> "maam"
     val theTime = Calendar.getInstance().getTimeInMillis
     val credit = formData.transaction.toDouble
-    new Entry(0, credit*formData.amount, formData.description, new Timestamp(theTime), formData.catID)
+    new Entry(0, credit*formData.amount, formData.description, new Timestamp(theTime), formData.catId)
   }
 }

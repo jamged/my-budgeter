@@ -54,9 +54,9 @@ class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     def amount = column[Double]("amount")
     def description = column[String]("description")
     def entry_time = column[Timestamp]("entry_time")
-    def catID = column[Long]("cat_id")
+    def catID = column[Long]("cat_id", O.Default(0))
 
-    def category = foreignKey("cat_fk", catID, categoryDAO.Categories)(_.id)
+    def category = foreignKey("cat_fk", catID, categoryDAO.Categories)(_.id, onDelete = ForeignKeyAction.SetNull)
 
     override def * =
       (id, amount, description, entry_time, catID) <> (Entry.tupled, Entry.unapply)

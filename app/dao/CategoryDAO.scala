@@ -1,5 +1,5 @@
 package dao
-import models.Category
+import models.{CategoryFormData, Category}
 import javax.inject.Inject
 
 import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
@@ -21,6 +21,18 @@ class CategoryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
   def add(category: Category) = {
     db.run(Categories += category)
+  }
+
+  def update(id: Long, data:CategoryFormData) = {
+    println("Updating category id: " + id)
+    val q = for {c <- Categories if c.id === id } yield (c.name, c.description)
+    db.run(q.update(data.name, data.description))
+  }
+
+  def delete(id: Long) = {
+    println("Deleting category id: " + id)
+    val q = for {c <- Categories if c.id === id } yield c
+    if (id != 0) db.run(q.delete)  // don't delete the default catch-all category
   }
 
   class CategoryTable(tag:Tag) extends Table[Category](tag, "categories"){

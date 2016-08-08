@@ -22,14 +22,14 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
 
   def defineNewEntry = Action.async {
     categoryDAO.listAll map {categories =>
-      Ok(views.html.create(EntryForm.form, categories))
+      Ok(views.html.newEntry(EntryForm.form, categories))
     }
   }
 
   def addEntry() = Action.async { implicit request =>
     categoryDAO.listAll map { categories =>
       EntryForm.form.bindFromRequest.fold(
-        errorForm => BadRequest(views.html.create(errorForm, categories)), // Handle error in form submission
+        errorForm => BadRequest(views.html.newEntry(errorForm, categories)), // Handle error in form submission
         formData => {
           println("form success!")
           println("value: " + formData.amount)
@@ -56,7 +56,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
       entries.find(e=> e.id == entryId) match {
         case Some(entry) =>
           val form = EntryForm.form.fill(EntryFormData(entry.amount.abs, entry.description, if (entry.amount > 0) "1" else "-1", entry.catID))
-          Ok(views.html.create(form, categories, entryId))
+          Ok(views.html.newEntry(form, categories, entryId))
         case None =>
           Redirect(routes.Application.index())
       }
@@ -66,7 +66,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
   def updateEntry(entryId: Long) = Action.async { implicit request =>
     categoryDAO.listAll map { categories =>
       EntryForm.form.bindFromRequest.fold(
-        errorForm => BadRequest(views.html.create(errorForm, categories, entryId)), // Handle error in form submission
+        errorForm => BadRequest(views.html.newEntry(errorForm, categories, entryId)), // Handle error in form submission
         formData => {
           println("form success!")
           println("value: " + formData.amount)
@@ -88,14 +88,14 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
 
   def defineNewCategory = Action.async {
     categoryDAO.listAll map {categories =>
-      Ok(views.html.newcategory(CategoryForm.form, categories))
+      Ok(views.html.newCategory(CategoryForm.form, categories))
     }
   }
 
   def addCategory() = Action.async { implicit request =>
       categoryDAO.listAll map { categories =>
         CategoryForm.form.bindFromRequest.fold(
-          errorForm => BadRequest(views.html.newcategory(errorForm, categories)), // Handle error in form submission
+          errorForm => BadRequest(views.html.newCategory(errorForm, categories)), // Handle error in form submission
           formData => {
             println("form success!")
             println("name: " + formData.name)
@@ -107,18 +107,40 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
       }
   }
 
-  def editCategory(catID: Long) = Action {
-    printf("should edit category with ID: %d", catID)
-    Redirect(routes.Application.index())
+  def editCategory(catId: Long) = Action.async {
+    for {
+      categories <- categoryDAO.listAll
+    } yield {
+      categories.find(c=> c.id == catId && c.id != 0) match {
+        case Some(cat) =>
+          val form = CategoryForm.form.fill(CategoryFormData(cat.name, cat.description))
+          Ok(views.html.newCategory(form, categories, catId))
+        case None =>
+          Redirect(routes.Application.index())
+      }
+    }
   }
 
-  def updateCategory(catID: Long) = Action {
-    Redirect(routes.Application.index())
+  def updateCategory(catId: Long) = Action.async { implicit request =>
+    categoryDAO.listAll map { categories =>
+      CategoryForm.form.bindFromRequest.fold(
+        errorForm => BadRequest(views.html.newCategory(errorForm, categories, catId)), // Handle error in form submission
+        formData => {
+          categoryDAO.update(catId, formData)
+          Redirect(routes.Application.showCategories())
+        }
+      )
+    }
+  }
+
+  def deleteCategory(catId: Long) = Action {
+    categoryDAO.delete(catId)
+    Redirect(routes.Application.showCategories())
   }
 
   def showCategories = Action.async {
     categoryDAO.listAll map { categories =>
-      Ok(views.html.categories(categories))
+      Ok(views.html.categories(categories.filter(c=>c.id!=0)))
     }
   }
 }
