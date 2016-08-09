@@ -68,7 +68,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
       EntryForm.form.bindFromRequest.fold(
         errorForm => BadRequest(views.html.newEntry(errorForm, categories, entryId)), // Handle error in form submission
         formData => {
-          println("form success!")
+          println("new entry form success!")
           println("value: " + formData.amount)
           println("description: " + formData.description)
           println("transaction: " + formData.transaction)
@@ -97,11 +97,17 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
         CategoryForm.form.bindFromRequest.fold(
           errorForm => BadRequest(views.html.newCategory(errorForm, categories)), // Handle error in form submission
           formData => {
-            println("form success!")
-            println("name: " + formData.name)
-            println("description: " + formData.description)
-            categoryDAO.add(Category(0, formData.name, formData.description))
-            Redirect(routes.Application.index())
+            categories.exists(c => c.name.equals(formData.name)) match {
+              case true =>
+                println("Already have category named" + formData.name)
+                BadRequest(views.html.newCategory(CategoryForm.form.fill(formData), categories, msg = "Already have a Category named " + formData.name ))
+              case false =>
+                println ("new category form success!")
+                println ("name: " + formData.name)
+                println ("description: " + formData.description)
+                categoryDAO.add (Category (0, formData.name, formData.description) )
+                Redirect (routes.Application.index () )
+            }
           }
         )
       }
@@ -126,8 +132,13 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
       CategoryForm.form.bindFromRequest.fold(
         errorForm => BadRequest(views.html.newCategory(errorForm, categories, catId)), // Handle error in form submission
         formData => {
-          categoryDAO.update(catId, formData)
-          Redirect(routes.Application.showCategories())
+          categories.exists(c => c.name.equals(formData.name) && c.id != catId) match {
+            case true =>
+              BadRequest(views.html.newCategory(CategoryForm.form.fill(formData), categories, catId, msg = "Already have a Category named " + formData.name ))
+            case false =>
+              categoryDAO.update(catId, formData)
+              Redirect(routes.Application.showCategories())
+          }
         }
       )
     }
