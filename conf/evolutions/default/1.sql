@@ -20,7 +20,7 @@ alter table "entries" add constraint "cat_fk" foreign key("cat_id") references "
 
 
 
-INSERT INTO "categories" VALUES (0, 'No Category', 'Default Category');
+INSERT INTO "categories" VALUES (0, ' None ', 'Default Category');
 
 # --- !Downs
 --DROP TABLE "entries";

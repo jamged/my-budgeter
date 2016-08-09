@@ -16,7 +16,7 @@ class CategoryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
   val Categories = TableQuery[CategoryTable]
 
   def listAll: Future[Seq[Category]] = {
-    db.run(Categories.sortBy(_.name).result)
+    db.run(Categories.sortBy(_.name.toLowerCase).result)
   }
 
   def add(category: Category) = {
