@@ -106,7 +106,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
                 println ("name: " + formData.name)
                 println ("description: " + formData.description)
                 categoryDAO.add (Category (0, formData.name, formData.description) )
-                Redirect (routes.Application.index () )
+                Redirect (routes.Application.showCategories() )
             }
           }
         )
