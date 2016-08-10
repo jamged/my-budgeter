@@ -13,7 +13,7 @@ import scala.concurrent.Future
 class CategoryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
-  val Categories = TableQuery[CategoryTable]
+  private[dao] val Categories = TableQuery[CategoryTable]
 
   def listAll: Future[Seq[Category]] = {
     db.run(Categories.sortBy(_.name.toLowerCase).result)
@@ -35,7 +35,7 @@ class CategoryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
     if (id != 0) db.run(q.delete)  // don't delete the default catch-all category
   }
 
-  class CategoryTable(tag:Tag) extends Table[Category](tag, "categories"){
+  private[dao] class CategoryTable(tag:Tag) extends Table[Category](tag, "categories"){
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name")
     def description = column[String]("description")
