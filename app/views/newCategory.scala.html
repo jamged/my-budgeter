@@ -11,8 +11,8 @@
         @inputText(entryForm("description"), 'size->50, '_showConstraints -> false, '_label -> "Description:")
 
         @if(id != 0) {
-        <input type="submit" formaction=@routes.Application.deleteCategory(id) value="Delete" />
-        <br><br>
+            <input type="submit" formaction=@routes.Application.deleteCategory(id) value="Delete" />
+            <br><br>
         }
 
         <input type="submit" value="Submit"  />
