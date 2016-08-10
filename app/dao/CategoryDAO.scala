@@ -3,6 +3,7 @@ import models.{CategoryFormData, Category}
 import javax.inject.Inject
 
 import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
+import play.db.NamedDatabase
 import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
@@ -10,7 +11,7 @@ import scala.concurrent.Future
 /**
   * Created by user on 8/5/16.
   */
-class CategoryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class CategoryDAO @Inject()(@NamedDatabase("heroku")protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
   private[dao] val Categories = TableQuery[CategoryTable]

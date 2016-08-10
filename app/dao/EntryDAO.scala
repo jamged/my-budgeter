@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import javax.inject.Inject
 import models.{EntryFormData, Entry, Category}
 import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
+import play.db.NamedDatabase
 import slick.driver.JdbcProfile
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -11,7 +12,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 /**
   * Created by user on 8/1/16.
   */
-class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, categoryDAO: CategoryDAO) extends HasDatabaseConfigProvider[JdbcProfile] {
+class EntryDAO @Inject()(@NamedDatabase("heroku") protected val dbConfigProvider: DatabaseConfigProvider, categoryDAO: CategoryDAO) extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
   private val Entries = TableQuery[EntryTable]
