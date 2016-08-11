@@ -13,7 +13,7 @@
 --  "description" TEXT,
 --);
 
-create table "entries" ("id" BIGSERIAL NOT NULL PRIMARY KEY,"amount" DOUBLE PRECISION NOT NULL,"description" VARCHAR NOT NULL,"entry_time" TIMESTAMP NOT NULL,"cat_id" BIGINT DEFAULT 0 NOT NULL)
+create table "entries" ("id" BIGSERIAL NOT NULL PRIMARY KEY,"amount" DOUBLE PRECISION NOT NULL,"description" VARCHAR NOT NULL,"entry_time" TIMESTAMP NOT NULL,"cat_id" BIGINT DEFAULT 0 NOT NULL);
 create table "categories" ("id" BIGSERIAL NOT NULL PRIMARY KEY,"name" VARCHAR NOT NULL,"description" VARCHAR NOT NULL);
 
 alter table "entries" add constraint "cat_fk" foreign key("cat_id") references "categories"("id") on update NO ACTION on delete SET NULL;
