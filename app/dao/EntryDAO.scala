@@ -35,7 +35,7 @@ class EntryDAO @Inject()(@NamedDatabase("heroku") protected val dbConfigProvider
   }
 
   def listAll: Future[Seq[Entry]] = {
-    db.run(Entries.result)
+    db.run(Entries.sortBy(_.entry_time.desc).result)
   }
 
   def listWithCat: Future[Seq[(Entry, Category)]] = {
@@ -43,7 +43,7 @@ class EntryDAO @Inject()(@NamedDatabase("heroku") protected val dbConfigProvider
       e <- Entries
       c <- e.category
     } yield (e, c)
-    db.run(q.result)
+    db.run(q.sortBy(_._1.entry_time.desc).result)
   }
 
   def findById(entryId: Long): Future[Option[Entry]] = {
