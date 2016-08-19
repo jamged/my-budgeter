@@ -8,7 +8,7 @@ import play.api.libs.functional.syntax._
 
 
 // Case class for items stored in "entry" table
-case class Entry (id: Long = 0, amount: Double, description: String, entry_time: Timestamp, catID: Long = 0)
+case class Entry (id: Long = 0, amount: Double, description: String, entry_time: Timestamp, catId: Long = 0)
 
 object Entry {
   // JSON formatter for reads/writes
@@ -18,8 +18,8 @@ object Entry {
     (JsPath \ "description").format[String] and
     (JsPath \ "entry_time").format[Long] and
     (JsPath \ "cat_id").format[Long]
-    )((id:Long, amt:Double, desc:String, time:Long, catID:Long)=> new Entry(id,amt,desc,new Timestamp(time), catID),
-      (e:Entry) => (e.id, e.amount, e.description, e.entry_time.getTime, e.catID))
+    )((id:Long, amt:Double, desc:String, time:Long, catId:Long)=> new Entry(id,amt,desc,new Timestamp(time), catId),
+      (e:Entry) => (e.id, e.amount, e.description, e.entry_time.getTime, e.catId))
 
   def tupled = (Entry.apply _).tupled
 

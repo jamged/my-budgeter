@@ -6,6 +6,7 @@ import play.api._
 import play.api.mvc._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import play.twirl.api.Html
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.libs.json.Json
 
@@ -16,7 +17,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
 
   def index = Action.async { implicit request =>
     entryDAO.listWithCat map {entries =>
-      Ok(views.html.index(entries))
+      Ok(views.html.index(entries)(Html("hi")))
     }
   }
 
@@ -55,7 +56,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
     } yield {
       entries.find(e=> e.id == entryId) match {
         case Some(entry) =>
-          val form = EntryForm.form.fill(EntryFormData(entry.amount.abs, entry.description, if (entry.amount > 0) "1" else "-1", entry.catID))
+          val form = EntryForm.form.fill(EntryFormData(entry.amount.abs, entry.description, if (entry.amount > 0) "1" else "-1", entry.catId))
           Ok(views.html.newEntry(form, categories, entryId))
         case None =>
           Redirect(routes.Application.index())
@@ -85,6 +86,38 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
     Redirect(routes.Application.index())
   }
 
+  def clearSearch = Action.async { implicit request =>
+    for {
+      entries <- entryDAO.listWithCat
+      allCategories <- categoryDAO.listAll
+    } yield {
+      entries.foreach(e=>println("entry catID: " + e._1.catId + " with category: " + e._2.name))
+      Ok(views.html.search(entries, allCategories, SearchForm.form))
+    }
+  }
+
+  def searchEntries = Action.async { implicit request =>
+    SearchForm.form.bindFromRequest.fold(
+      errorForm => {
+        for {
+          entries <- entryDAO.listWithCat
+          allCategories <- categoryDAO.listAll
+        } yield {
+          Ok(views.html.search(entries, allCategories, errorForm))
+        }
+      },
+      formData => {
+        for {
+          results <- entryDAO.search(formData.catId, searchText=formData.searchText)
+          allCategories <- categoryDAO.listAll
+        } yield {
+          println("finished search! results are...")
+          results.foreach(e=>println("entry catID: " + e._1.catId + " with category: " + e._2.name))
+          Ok(views.html.search(results, allCategories, SearchForm.form.fill(formData)))
+        }
+      }
+    )
+  }
 
   def defineNewCategory = Action.async {
     categoryDAO.listAll map {categories =>
@@ -154,4 +187,5 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
       Ok(views.html.categories(categories.filter(c=>c.id!=0)))
     }
   }
+
 }
