@@ -57,10 +57,9 @@ class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
                       (e.entry_time < endDay) &&
                       (e.description.toLowerCase like "%"+searchText.toLowerCase+"%" ) &&
                       (catId match {
-                                    case Some(cat) =>
-                                      println("IN SEARCH: test that catId((" + cat + ")) equals e.id((" + e.catId +"))")
-                                      e.catId === cat
-                                    case None => true})
+                        case Some(cat) => e.catId === cat
+                        case None => true
+                      })
       c <- e.category
     } yield (e, c)
 

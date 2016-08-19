@@ -3,7 +3,9 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                           controllers.Application.showEntries
+
+GET     /entries                    controllers.Application.showEntries
 
 GET     /entries/new                controllers.Application.defineNewEntry
 

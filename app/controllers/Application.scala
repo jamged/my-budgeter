@@ -15,7 +15,7 @@ import models._
 
 class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) extends Controller {
 
-  def index = Action.async { implicit request =>
+  def showEntries = Action.async { implicit request =>
     entryDAO.listWithCat map {entries =>
       Ok(views.html.index(entries)(Html("hi")))
     }
@@ -37,7 +37,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
           println("description: " + formData.description)
           println("transaction: " + formData.transaction)
           entryDAO.add(EntryMaker(formData))
-          Redirect(routes.Application.index())
+          Redirect(routes.Application.showEntries())
         }
       )
     }
@@ -59,7 +59,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
           val form = EntryForm.form.fill(EntryFormData(entry.amount.abs, entry.description, if (entry.amount > 0) "1" else "-1", entry.catId))
           Ok(views.html.newEntry(form, categories, entryId))
         case None =>
-          Redirect(routes.Application.index())
+          Redirect(routes.Application.showEntries())
       }
     }
   }
@@ -74,7 +74,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
           println("description: " + formData.description)
           println("transaction: " + formData.transaction)
           entryDAO.update(entryId, EntryMaker(formData))
-          Redirect(routes.Application.index())
+          Redirect(routes.Application.showEntries())
         }
       )
     }
@@ -83,10 +83,10 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
   def deleteEntry(entryId: Long) = Action {
     println("Deleting a thing")
     entryDAO.delete(entryId)
-    Redirect(routes.Application.index())
+    Redirect(routes.Application.showEntries())
   }
 
-  def clearSearch = Action.async { implicit request =>
+  def clearSearch = Action.async {
     for {
       entries <- entryDAO.listWithCat
       allCategories <- categoryDAO.listAll
@@ -99,20 +99,19 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
   def searchEntries = Action.async { implicit request =>
     SearchForm.form.bindFromRequest.fold(
       errorForm => {
-        for {
-          entries <- entryDAO.listWithCat
-          allCategories <- categoryDAO.listAll
-        } yield {
-          Ok(views.html.search(entries, allCategories, errorForm))
-        }
+        println("ERROR IN ENTRY SEARCH FORM???")
+        clearSearch.apply(request)
       },
       formData => {
+        println("Search form success!")
+        println("category ID: " + formData.catId)
+        println("startDate: " + formData.startDate)
+        println("endDate: " + formData.endDate)
+        println("searchText: " + formData.searchText)
         for {
           results <- entryDAO.search(formData.catId, searchText=formData.searchText)
           allCategories <- categoryDAO.listAll
         } yield {
-          println("finished search! results are...")
-          results.foreach(e=>println("entry catID: " + e._1.catId + " with category: " + e._2.name))
           Ok(views.html.search(results, allCategories, SearchForm.form.fill(formData)))
         }
       }
@@ -155,7 +154,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
           val form = CategoryForm.form.fill(CategoryFormData(cat.name, cat.description))
           Ok(views.html.newCategory(form, categories, catId))
         case None =>
-          Redirect(routes.Application.index())
+          Redirect(routes.Application.showCategories())
       }
     }
   }
