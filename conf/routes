@@ -3,11 +3,17 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                           controllers.Application.showEntries
+
+GET     /entries                    controllers.Application.showEntries
 
 GET     /entries/new                controllers.Application.defineNewEntry
 
 POST    /entries/new                controllers.Application.addEntry
+
+GET     /entries/search             controllers.Application.clearSearch
+
+POST    /entries/search             controllers.Application.searchEntries
 
 GET     /json                       controllers.Application.toJson
 

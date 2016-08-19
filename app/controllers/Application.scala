@@ -6,6 +6,7 @@ import play.api._
 import play.api.mvc._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import play.twirl.api.Html
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.libs.json.Json
 
@@ -14,9 +15,9 @@ import models._
 
 class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) extends Controller {
 
-  def index = Action.async { implicit request =>
+  def showEntries = Action.async { implicit request =>
     entryDAO.listWithCat map {entries =>
-      Ok(views.html.index(entries))
+      Ok(views.html.index(entries)(Html("hi")))
     }
   }
 
@@ -36,7 +37,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
           println("description: " + formData.description)
           println("transaction: " + formData.transaction)
           entryDAO.add(EntryMaker(formData))
-          Redirect(routes.Application.index())
+          Redirect(routes.Application.showEntries())
         }
       )
     }
@@ -55,10 +56,10 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
     } yield {
       entries.find(e=> e.id == entryId) match {
         case Some(entry) =>
-          val form = EntryForm.form.fill(EntryFormData(entry.amount.abs, entry.description, if (entry.amount > 0) "1" else "-1", entry.catID))
+          val form = EntryForm.form.fill(EntryFormData(entry.amount.abs, entry.description, if (entry.amount > 0) "1" else "-1", entry.catId))
           Ok(views.html.newEntry(form, categories, entryId))
         case None =>
-          Redirect(routes.Application.index())
+          Redirect(routes.Application.showEntries())
       }
     }
   }
@@ -73,7 +74,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
           println("description: " + formData.description)
           println("transaction: " + formData.transaction)
           entryDAO.update(entryId, EntryMaker(formData))
-          Redirect(routes.Application.index())
+          Redirect(routes.Application.showEntries())
         }
       )
     }
@@ -82,9 +83,40 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
   def deleteEntry(entryId: Long) = Action {
     println("Deleting a thing")
     entryDAO.delete(entryId)
-    Redirect(routes.Application.index())
+    Redirect(routes.Application.showEntries())
   }
 
+  def clearSearch = Action.async {
+    for {
+      entries <- entryDAO.listWithCat
+      allCategories <- categoryDAO.listAll
+    } yield {
+      entries.foreach(e=>println("entry catID: " + e._1.catId + " with category: " + e._2.name))
+      Ok(views.html.search(entries, allCategories, SearchForm.form))
+    }
+  }
+
+  def searchEntries = Action.async { implicit request =>
+    SearchForm.form.bindFromRequest.fold(
+      errorForm => {
+        println("ERROR IN ENTRY SEARCH FORM???")
+        clearSearch.apply(request)
+      },
+      formData => {
+        println("Search form success!")
+        println("category ID: " + formData.catId)
+        println("startDate: " + formData.startDate)
+        println("endDate: " + formData.endDate)
+        println("searchText: " + formData.searchText)
+        for {
+          results <- entryDAO.search(formData.catId, searchText=formData.searchText)
+          allCategories <- categoryDAO.listAll
+        } yield {
+          Ok(views.html.search(results, allCategories, SearchForm.form.fill(formData)))
+        }
+      }
+    )
+  }
 
   def defineNewCategory = Action.async {
     categoryDAO.listAll map {categories =>
@@ -122,7 +154,7 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
           val form = CategoryForm.form.fill(CategoryFormData(cat.name, cat.description))
           Ok(views.html.newCategory(form, categories, catId))
         case None =>
-          Redirect(routes.Application.index())
+          Redirect(routes.Application.showCategories())
       }
     }
   }
@@ -154,4 +186,5 @@ class Application @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) exten
       Ok(views.html.categories(categories.filter(c=>c.id!=0)))
     }
   }
+
 }

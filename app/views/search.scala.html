@@ -1,0 +1,14 @@
+@(entries: Seq[(Entry, Category)], categories: Seq[Category], searchForm: Form[SearchFormData])(implicit messages: Messages)
+@import helper._
+
+
+
+@index(entries){
+    @form(action = routes.Application.searchEntries) {
+        @select(searchForm("catId"), options = categories.map(c=>c.id.toString->c.name).+:(""->"All Categories"), '_label -> "Category:", '_showConstraints -> false) </div>
+        @inputDate(searchForm("startDate"), '_label -> "Start date:")
+        @inputDate(searchForm("endDate"), '_label -> "End date:")
+        @inputText(searchForm("searchText"), 'size->20, '_label -> "Description text:")
+        <input type="submit" value="Search" style=""><a href="@routes.Application.clearSearch">Clear</a>
+    }
+}
