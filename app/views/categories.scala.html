@@ -4,7 +4,7 @@
 
 <h2>All Categories</h2>
 
-<form action=@routes.Application.defineNewCategory>
+<form action=@routes.CategoryController.defineNewCategory>
     <input type="submit" value="Create New Category">
 </form>
 
@@ -18,7 +18,7 @@
         </tr>
         @for(category <- categories) {
         <tr>
-            <td><a href="@routes.Application.editCategory(category.id)">Edit</a></td>
+            <td><a href="@routes.CategoryController.editCategory(category.id)">Edit</a></td>
             <td>@category.name</td>
             <td>@category.description</td>
         </tr>

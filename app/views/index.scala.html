@@ -7,7 +7,7 @@
 </div>
 <h2>Grand Total: @formatter.format(entries.map(e=>e._1).foldLeft(0.0){(z, i) => z + i.amount})</h2>
 
-    <form action=@routes.Application.defineNewEntry>
+    <form action=@routes.EntryController.defineNewEntry>
         <input type="submit" value="Create New Entry">
     </form>
 
@@ -23,7 +23,7 @@
             </tr>
             @for(entry <- entries) {
                 <tr>
-                    <td><a href="@routes.Application.editEntry(entry._1.id)">Edit</a></td>
+                    <td><a href="@routes.EntryController.editEntry(entry._1.id)">Edit</a></td>
                     <td>@formatter.format(entry._1.amount)</td>
                     <td>@entry._1.description</td>
                     <td>@entry._2.name</td>
