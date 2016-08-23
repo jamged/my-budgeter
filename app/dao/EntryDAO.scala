@@ -52,6 +52,7 @@ class EntryDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   def search(catId: Option[Long] = None, startDay: Timestamp = new Timestamp(0), endDay: Timestamp = new Timestamp(Calendar.getInstance().getTimeInMillis), searchText: String = ""): Future[Seq[(Entry, Category)]] = {
     println("searching with catID: " + catId.toString + " and searchText: " + searchText)
+    println("and startDay: " + startDay + " and endDay: " + endDay)
     val q = for {
       e <- Entries if (e.entry_time > startDay) &&
                       (e.entry_time < endDay) &&
