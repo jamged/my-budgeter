@@ -6,8 +6,8 @@
 @entryTable(entries){
     @form(action = routes.EntryController.searchEntries) {
         @select(searchForm("catId"), options = categories.map(c=>c.id.toString->c.name).+:(""->"All Categories"), '_label -> "Category:", '_showConstraints -> false)
-        @inputDate(searchForm("startDate"), '_label -> "Start date:")
-        @inputDate(searchForm("endDate"), '_label -> "End date:")
+        @inputDate(searchForm("startDate"), '_label -> "Start date:", 'pattern -> "[0-9]{4}[-]([1-9]|[0-9]{2})[-]([1-9]|[0-9]{2})", 'title -> "YYYY-MM-DD", 'placeholder->"YYYY-MM-DD")
+        @inputDate(searchForm("endDate"), '_label -> "End date:", 'pattern -> "[0-9]{4}[-]([1-9]|[0-2]{2})[-]([1-9]{1}|[0-9]{2})", 'title -> "YYYY-MM-DD", 'placeholder->"YYYY-MM-DD")
         @inputText(searchForm("searchText"), 'size->20, '_label -> "Description text:")
         <input type="submit" value="Search" style="">  &nbsp; <a href="@routes.EntryController.clearSearch">Clear</a>
     }

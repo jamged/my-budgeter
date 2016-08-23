@@ -1,5 +1,8 @@
 package controllers
 
+import java.sql.Timestamp
+import java.time.LocalDate
+import java.util.Calendar
 import javax.inject.Inject
 
 import dao.{CategoryDAO, EntryDAO}
@@ -81,7 +84,6 @@ class EntryController @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) e
   }
 
   def deleteEntry(entryId: Long) = Action {
-    println("Deleting a thing")
     entryDAO.delete(entryId)
     Redirect(routes.EntryController.showEntries())
   }
@@ -110,8 +112,16 @@ class EntryController @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) e
         println("startDate: " + formData.startDate)
         println("endDate: " + formData.endDate)
         println("searchText: " + formData.searchText)
+        val startTimestamp = formData.startDate match {
+          case "" => new Timestamp(0)
+          case _ => Timestamp.valueOf(formData.startDate + " 00:00:00")
+        }
+        val endTimestamp = formData.endDate match {
+          case "" => new Timestamp(Calendar.getInstance().getTimeInMillis)
+          case _ => Timestamp.valueOf(formData.endDate + " 23:59:59")
+        }
         for {
-          results <- entryDAO.search(formData.catId, searchText=formData.searchText)
+          results <- entryDAO.search(formData.catId, startTimestamp, endTimestamp, formData.searchText)
           allCategories <- categoryDAO.listAll
         } yield {
           Ok(views.html.search(results, allCategories, SearchForm.form.fill(formData)))
