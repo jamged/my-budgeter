@@ -6,7 +6,7 @@
 @main("Budgetron 1.0") {
     <h2> Fill out the form for a new budget entry</h2>
 
-     @form(action = if (id !=0) routes.Application.updateEntry(id) else routes.Application.addEntry()) {
+     @form(action = if (id !=0) routes.EntryController.updateEntry(id) else routes.EntryController.addEntry()) {
         @inputText(entryForm("amount"), '_showConstraints -> false, '_label -> "Amount:")
         @inputText(entryForm("description"), 'size->50, '_showConstraints -> false, '_label -> "Description:")
         @select(entryForm("category"), options = categories.map(c=>c.id.toString->c.name), '_label -> "Category:", '_showConstraints -> false)
@@ -17,7 +17,7 @@
             '_showConstraints->false)
 
         @if(id != 0) {
-            <input type="submit" formaction=@routes.Application.deleteEntry(id) value="Delete" />
+            <input type="submit" formaction=@routes.EntryController.deleteEntry(id) value="Delete" />
         <br><br>
         }
 

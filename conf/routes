@@ -3,37 +3,37 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.showEntries
+GET     /                           controllers.EntryController.showEntries
 
-GET     /entries                    controllers.Application.showEntries
+GET     /entries                    controllers.EntryController.showEntries
 
-GET     /entries/new                controllers.Application.defineNewEntry
+GET     /entries/new                controllers.EntryController.defineNewEntry
 
-POST    /entries/new                controllers.Application.addEntry
+POST    /entries/new                controllers.EntryController.addEntry
 
-GET     /entries/search             controllers.Application.clearSearch
+GET     /entries/search             controllers.EntryController.clearSearch
 
-POST    /entries/search             controllers.Application.searchEntries
+POST    /entries/search             controllers.EntryController.searchEntries
 
-GET     /json                       controllers.Application.toJson
+GET     /json                       controllers.EntryController.toJson
 
-GET     /entries/edit/:id           controllers.Application.editEntry(id:Long)
+GET     /entries/edit/:id           controllers.EntryController.editEntry(id:Long)
 
-POST    /entries/edit/:id           controllers.Application.updateEntry(id:Long)
+POST    /entries/edit/:id           controllers.EntryController.updateEntry(id:Long)
 
-POST    /entries/delete/:id         controllers.Application.deleteEntry(id:Long)
+POST    /entries/delete/:id         controllers.EntryController.deleteEntry(id:Long)
 
-GET     /categories/new             controllers.Application.defineNewCategory
+GET     /categories/new             controllers.CategoryController.defineNewCategory
 
-POST    /categories/new             controllers.Application.addCategory
+POST    /categories/new             controllers.CategoryController.addCategory
 
-GET     /categories                 controllers.Application.showCategories
+GET     /categories                 controllers.CategoryController.showCategories
 
-GET     /categories/edit/:id        controllers.Application.editCategory(id:Long)
+GET     /categories/edit/:id        controllers.CategoryController.editCategory(id:Long)
 
-POST    /categories/edit/:id        controllers.Application.updateCategory(id:Long)
+POST    /categories/edit/:id        controllers.CategoryController.updateCategory(id:Long)
 
-POST    /categories/delete/:id      controllers.Application.deleteCategory(id:Long)
+POST    /categories/delete/:id      controllers.CategoryController.deleteCategory(id:Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
