@@ -3,12 +3,12 @@ package controllers
 import javax.inject.Inject
 
 import dao.{CategoryDAO, EntryDAO}
-import models.{SearchForm, EntryFormData, EntryMaker, EntryForm}
+import models._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import play.twirl.api.Html
-import play.api.Play.current
+import play.api.data.Form
 
+import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -17,7 +17,7 @@ class EntryController @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) e
 
   def showEntries = Action.async { implicit request =>
     entryDAO.listWithCat map {entries =>
-      Ok(views.html.index(entries)(Html("hi")))
+      Ok(views.html.entries(entries))
     }
   }
 
@@ -37,7 +37,6 @@ class EntryController @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) e
           println("description: " + formData.description)
           println("transaction: " + formData.transaction)
           entryDAO.add(EntryMaker(formData))
-          //todo
           Redirect(routes.EntryController.showEntries())
         }
       )
@@ -60,7 +59,6 @@ class EntryController @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) e
           val form = EntryForm.form.fill(EntryFormData(entry.amount.abs, entry.description, if (entry.amount > 0) "1" else "-1", entry.catId))
           Ok(views.html.newEntry(form, categories, entryId))
         case None =>
-          //todo
           Redirect(routes.EntryController.showEntries())
       }
     }
@@ -76,7 +74,6 @@ class EntryController @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) e
           println("description: " + formData.description)
           println("transaction: " + formData.transaction)
           entryDAO.update(entryId, EntryMaker(formData))
-          //todo
           Redirect(routes.EntryController.showEntries())
         }
       )
@@ -86,17 +83,18 @@ class EntryController @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) e
   def deleteEntry(entryId: Long) = Action {
     println("Deleting a thing")
     entryDAO.delete(entryId)
-    //todo
     Redirect(routes.EntryController.showEntries())
   }
 
-  def clearSearch = Action.async {
+  def clearSearch = Action.async { implicit request =>
+    searchWithForm(SearchForm.form)(request)
+  }
+
+  def searchWithForm(form: Form[SearchFormData]) = Action.async {
     for {
-      entries <- entryDAO.listWithCat
       allCategories <- categoryDAO.listAll
     } yield {
-      entries.foreach(e=>println("entry catID: " + e._1.catId + " with category: " + e._2.name))
-      Ok(views.html.search(entries, allCategories, SearchForm.form))
+      Ok(views.html.search(Seq(), allCategories, form))
     }
   }
 
@@ -104,7 +102,7 @@ class EntryController @Inject() (entryDAO: EntryDAO, categoryDAO: CategoryDAO) e
     SearchForm.form.bindFromRequest.fold(
       errorForm => {
         println("ERROR IN ENTRY SEARCH FORM???")
-        clearSearch.apply(request)
+        searchWithForm(errorForm)(request)
       },
       formData => {
         println("Search form success!")

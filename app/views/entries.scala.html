@@ -1,0 +1,8 @@
+@(entries: Seq[(Entry, Category)])
+
+@entryTable(entries){
+<br>
+    <form action=@routes.EntryController.defineNewEntry>
+        <input type="submit" value="Create New Entry">
+    </form>
+}

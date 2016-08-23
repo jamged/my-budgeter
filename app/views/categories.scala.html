@@ -1,9 +1,7 @@
 @(categories: Seq[Category])
 
 @main("Budgetron 1.0") {
-
-<h2>All Categories</h2>
-
+<br>
 <form action=@routes.CategoryController.defineNewCategory>
     <input type="submit" value="Create New Category">
 </form>

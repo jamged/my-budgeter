@@ -33,7 +33,6 @@ class CategoryController @Inject() (categoryDAO: CategoryDAO) extends Controller
               println ("name: " + formData.name)
               println ("description: " + formData.description)
               categoryDAO.add (Category (0, formData.name, formData.description) )
-              //TODO
               Redirect (routes.CategoryController.showCategories() )
           }
         }
@@ -50,7 +49,6 @@ class CategoryController @Inject() (categoryDAO: CategoryDAO) extends Controller
           val form = CategoryForm.form.fill(CategoryFormData(cat.name, cat.description))
           Ok(views.html.newCategory(form, categories, catId))
         case None =>
-          // TODO
           Redirect(routes.CategoryController.showCategories())
       }
     }
@@ -66,7 +64,6 @@ class CategoryController @Inject() (categoryDAO: CategoryDAO) extends Controller
               BadRequest(views.html.newCategory(CategoryForm.form.fill(formData), categories, catId, msg = "Already have a Category named " + formData.name ))
             case false =>
               categoryDAO.update(catId, formData)
-              //todo
               Redirect(routes.CategoryController.showCategories())
           }
         }
@@ -76,7 +73,6 @@ class CategoryController @Inject() (categoryDAO: CategoryDAO) extends Controller
 
   def deleteCategory(catId: Long) = Action {
     categoryDAO.delete(catId)
-    //todo
     Redirect(routes.CategoryController.showCategories())
   }
 
